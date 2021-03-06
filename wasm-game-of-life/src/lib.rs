@@ -1,6 +1,7 @@
 mod utils;
 
 use fixedbitset::FixedBitSet;
+use js_sys::Math;
 use std::fmt;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
@@ -63,7 +64,7 @@ impl Universe {
         let mut cells = FixedBitSet::with_capacity(size);
 
         for i in 0..size {
-            cells.set(i, js_sys::Math::random() < 0.5);
+            cells.set(i, Math::random() < 0.5);
         }
 
         Universe {
