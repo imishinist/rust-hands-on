@@ -144,7 +144,7 @@ impl Universe {
 
     pub fn put_line(&mut self) {
         let mut points = Vec::new();
-        for i in (0..6) {
+        for i in 0..6 {
             points.push((i, 0));
             points.push((i, 1));
             points.push((i + 3, 7));
@@ -159,7 +159,11 @@ impl Universe {
     }
 
     pub fn put_nebra(&mut self) {
-        self.put_points(vec![(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]);
+        let mut points = Vec::new();
+        for i in 0..6 {
+            points.push((i, 0));
+        }
+        self.put_points(points);
     }
 
     pub fn render(&self) -> String {
