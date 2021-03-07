@@ -22,7 +22,7 @@ const fps = new class {
         this.frames.push(fps);
         if (this.frames.length > 100) {
             this.frames.shift();
-nnn        }
+        }
 
         let min = Infinity;
         let max = -Infinity;
