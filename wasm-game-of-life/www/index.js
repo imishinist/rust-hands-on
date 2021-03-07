@@ -1,7 +1,7 @@
 import { Universe, Cell, Timer } from "wasm-game-of-life";
 import { memory } from "wasm-game-of-life/wasm_game_of_life_bg";
 
-const CELL_SIZE = 5;
+const CELL_SIZE = 10;
 const GRID_COLOR = "#CCCCCC";
 const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
@@ -22,7 +22,7 @@ const fps = new class {
         this.frames.push(fps);
         if (this.frames.length > 100) {
             this.frames.shift();
-        }
+nnn        }
 
         let min = Infinity;
         let max = -Infinity;
@@ -45,7 +45,7 @@ max of last 100 = ${Math.round(max)}
     }
 };
 
-const universe = Universe.new();
+const universe = Universe.new(1);
 const width = universe.width();
 const height = universe.height();
 
@@ -119,6 +119,7 @@ const isPaused = () => {
 };
 
 const playPauseButton = document.getElementById("play-pause");
+const playOnceButton = document.getElementById("play-once");
 
 const play = () => {
     playPauseButton.textContent = "⏸";
@@ -139,6 +140,20 @@ playPauseButton.addEventListener("click", event => {
     }
 });
 
+playOnceButton.addEventListener("click", event => {
+    if (isPaused()) {
+        universe.tick();
+
+        drawGrid();
+        drawCells();
+        fps.render();
+    }
+});
+
+// universe.put_spaceship();
+universe.put_line();
+
 drawGrid();
 drawCells();
-play();
+fps.render();
+pause();

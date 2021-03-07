@@ -48,23 +48,45 @@ pub enum Cell {
 }
 
 #[wasm_bindgen]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum InitType {
+    Random = 0,
+    Clear = 1,
+}
+
+impl Default for InitType {
+    fn default() -> Self {
+        InitType::Random
+    }
+}
+
+#[wasm_bindgen]
 pub struct Universe {
     width: u32,
     height: u32,
     cells: FixedBitSet,
 }
 
+// index![col, row]
+macro_rules! index {
+    ($col:expr, $row:expr, $width:expr) => {
+        ($row * $width + $col) as usize
+    };
+}
+
 #[wasm_bindgen]
 impl Universe {
-    pub fn new() -> Universe {
+    pub fn new(ty: InitType) -> Universe {
         let width = 64;
         let height = 64;
 
         let size = (width * height) as usize;
         let mut cells = FixedBitSet::with_capacity(size);
 
-        for i in 0..size {
-            cells.set(i, Math::random() < 0.5);
+        match ty {
+            InitType::Random => Universe::init_random(width, height, &mut cells),
+            InitType::Clear => {}
         }
 
         Universe {
@@ -72,6 +94,72 @@ impl Universe {
             height,
             cells,
         }
+    }
+
+    fn init_random(width: u32, height: u32, cells: &mut FixedBitSet) {
+        let size = (width * height) as usize;
+        for i in 0..size {
+            cells.set(i, Math::random() < 0.5);
+        }
+    }
+
+    pub fn clear(&mut self) {
+        let size = (self.width * self.height) as usize;
+        self.cells = FixedBitSet::with_capacity(size);
+    }
+
+    pub fn put_random(&mut self) {
+        let mut next = self.cells.clone();
+        Universe::init_random(self.width, self.height, &mut next);
+        self.cells = next;
+    }
+
+    fn put_points(&mut self, points: Vec<(u32, u32)>) {
+        let offset_row = 5;
+        let offset_col = 5;
+        let mut next = self.cells.clone();
+        for (x, y) in points {
+            next.set(index![x + offset_col, y + offset_row, self.width], true);
+        }
+        self.cells = next;
+    }
+
+    pub fn put_glider(&mut self) {
+        self.put_points(vec![(1, 0), (2, 1), (0, 2), (1, 2), (2, 2)]);
+    }
+
+    pub fn put_spaceship(&mut self) {
+        self.put_points(vec![
+            (0, 0),
+            (3, 0),
+            (4, 1),
+            (0, 2),
+            (4, 2),
+            (1, 3),
+            (2, 3),
+            (3, 3),
+            (4, 3),
+        ]);
+    }
+
+    pub fn put_line(&mut self) {
+        let mut points = Vec::new();
+        for i in (0..6) {
+            points.push((i, 0));
+            points.push((i, 1));
+            points.push((i + 3, 7));
+            points.push((i + 3, 8));
+
+            points.push((0, i + 3));
+            points.push((1, i + 3));
+            points.push((7, i));
+            points.push((8, i));
+        }
+        self.put_points(points);
+    }
+
+    pub fn put_nebra(&mut self) {
+        self.put_points(vec![(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]);
     }
 
     pub fn render(&self) -> String {
