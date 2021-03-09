@@ -56,6 +56,7 @@ pub struct Universe {
     width: u32,
     height: u32,
     cells: FixedBitSet,
+    perf: bool,
 }
 
 // index![col, row]
@@ -83,7 +84,12 @@ impl Universe {
             width,
             height,
             cells,
+            perf: false,
         }
+    }
+
+    pub fn set_perf(&mut self) {
+        self.perf = true;
     }
 
     fn init_random(width: u32, height: u32, cells: &mut FixedBitSet) {
@@ -161,7 +167,10 @@ impl Universe {
     }
 
     pub fn tick(&mut self) {
-        // let _timer = Timer::new("Universe::tick");
+        let _timer;
+        if self.perf {
+            _timer = Timer::new("Universe::tick");
+        }
         let mut next = self.cells.clone();
 
         for row in 0..self.height {
